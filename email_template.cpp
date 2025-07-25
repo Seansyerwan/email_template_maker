@@ -78,7 +78,7 @@ event_special::event_special(std::string name, std::string desc, std::string col
 }
 
 /*
-* Setter function for collaborators string
+* Setter method for collaborators string
 * @param String to replace data for.
 * @return N\A
 */
@@ -86,6 +86,10 @@ void event_special::setCollaborators(std::string collaborators) {
 	this->collaborators = collaborators;
 }
 
+
+/*
+* Getter method for getting details of collaborators.
+*/
 std::string event_special::getCollaborators() {
 	return (this->collaborators);
 }
@@ -102,23 +106,23 @@ event_special::~event_special() {
 email_reader::email_reader() {}
 
 /*
-* Format function for generic event
+* Format method for generic event
 * @param event_generic pointer
 * @return Formatted version of both name and description of event.
 */
 void email_reader::format(event_generic* event) {
-	(this->result) += "<h3>" + (event->getName()) + "</h3>";
+	(this->result) += "<h3>" + (event->getName()) + "</h3>\n\n";
 	(this->result) += "<p>" + (event->getDesc()) + "</p>";
 }
 
 
 /*
-* Format function for generic event
+* Format method for generic event
 * @param event_special pointer
 * @return Formatted version of both name and description of event.
 */
 void email_reader::format(event_special* event) {
-	(this->result) += "<h3>" + (event->getName()) + "</h3>";
+	(this->result) += "<h3>" + (event->getName()) + "</h3>\n\n";
 	(this->result) += "<p>" + (event->getDesc()) + "</p>";
 }
 
