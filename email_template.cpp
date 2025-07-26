@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <string>
 #include "email_template.h"
 
 
@@ -129,7 +130,7 @@ void email_reader::format(event_generic* event) {
 void email_reader::format(event_special* event) {
 	std::string result = "";
 	result += "<h3>" + (event->getName()) + "</h3>\n\n";
-	result += "<h4> In collaboration with " + (event->getCollaborators()) + "</h4>\n";
+	result += "<h4>In collaboration with " + (event->getCollaborators()) + "</h4>\n";
 	result += "<p>" + (event->getDesc()) + "</p>\n";
 	this->result.push_back(result);
 	
@@ -144,6 +145,83 @@ void email_reader::format(event_special* event) {
 std::vector<std::string> email_reader::getResult() {
 	return this->result;
 }
+
+/*
+* Method for updating a specific part of result for generic event
+* @param unsigned int index
+* @return Modified 
+
+void email_reader::modify_result(unsigned int index) {
+	if (this->result.size() < index){
+		std::cout << "Invalid input: out of range";
+		return;
+	}
+	std::string res = "";
+	char choice = ' ';
+	std::cout << "What do you wish to modify for index " + index << " ?\n1:name\n2:desc\n3:neither\n" << std::endl;
+	std::cin >> choice;
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+	//if the choice is one or two
+	if (choice == '1' || choice == '2') {
+		std::string splitter = "</h3>";
+
+		std::cout << "Please input your replacement for your choice:";
+		std::getline(std::cin, res);
+
+		//we either insert the replacement before or after the header ending.
+		std::string temp = choice == '1' ? "<h3>" + res +
+			this->result[index].substr(this->result[index].find(splitter)) : "</h3>" +
+			this->result[index].substr(0, this->result[index].find(splitter)) + "<p>" + res + "</p>";
+		
+		this->result[index] = temp;
+	}
+}*/
+
+
+/*
+* Method for updating a specific part of result for special event
+* @param unsigned int index
+* @return Modified
+*/
+void email_reader::modify_result(unsigned int index) {
+	if (this->result.size()-1 < index) {
+		std::cout << "Invalid input: out of range";
+		return;
+	}
+	std::string res = "";
+	char choice = ' ';
+	std::cout << "What do you wish to modify for index " + index << " ?\n1:name\n2:desc\n3:collaborators\n4:None of the above\n" << std::endl;
+	std::cin >> choice;
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+	//if the choice is one, two or three
+	if (choice == '1' || choice == '2' || choice == '3') {
+
+		//should a user try to modify collaborators when not present, it is then ignored.
+		if (choice == '3') { 
+			int present = this->result[index].find("<h4>");
+			if (present == -1) {
+				std::cout << "No collaborators! Try again." << std::endl;
+				return;
+			}
+		}
+
+
+		std::cout << "Please input your replacement for your choice:";
+		std::getline(std::cin, res);
+
+		//we either insert the replacement in the name, the description or the collaborators section. 
+		std::string temp = choice == '1' ? "<h3>" + res +
+			this->result[index].substr(this->result[index].find("</h3>")) : choice == '2' ? "</h3>" +
+			this->result[index].substr(0, this->result[index].find("</h3>")) + "<p>" + res + "</p>" :
+		  this->result[index].substr(0, this->result[index].find("<h4>")) + "<h4>In collaboration with " + res + this->result[index].substr(this->result[index].find("</h4>"));
+
+		this->result[index] = temp;
+	}
+}
+
+
 
 /*
 * Destructor for email reader object.
