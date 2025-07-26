@@ -62,7 +62,7 @@ std::string event_generic::getDesc() {
 */
 event_generic::~event_generic() {
 	//delete this->priority;
-	std::cout << "Generic event deleted" << std::endl;
+	//std::cout << "Generic event deleted" << std::endl;
 }
 
 
@@ -97,7 +97,7 @@ std::string event_special::getCollaborators() {
 }
 
 event_special::~event_special() {
-	std::cout << "Deleted special event details" << std::endl;
+	//std::cout << "Deleted special event details" << std::endl;
 }
 
 /*
@@ -146,5 +146,5 @@ std::string email_reader::getResult() {
 * @return N\A
 */
 email_reader::~email_reader() {
-	std::cout << "email_reader deleted" << std::endl;
+	//std::cout << "email_reader deleted" << std::endl;
 }
