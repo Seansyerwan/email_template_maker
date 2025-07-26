@@ -18,11 +18,12 @@ protected:
 
 
 class event_special : public event_generic {
+public:
 	event_special(std::string name, std::string desc, std::string collaborators);
 	void setCollaborators(std::string collaborators);
 	std::string getCollaborators();
 	~event_special();
-private: 
+protected: 
 	std::string collaborators;
 };
 

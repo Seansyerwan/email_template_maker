@@ -89,6 +89,8 @@ void event_special::setCollaborators(std::string collaborators) {
 
 /*
 * Getter method for getting details of collaborators.
+* @param N\A
+* @return collaborators string
 */
 std::string event_special::getCollaborators() {
 	return (this->collaborators);
@@ -124,6 +126,7 @@ void email_reader::format(event_generic* event) {
 void email_reader::format(event_special* event) {
 	(this->result) += "<h3>" + (event->getName()) + "</h3>\n\n";
 	(this->result) += "<p>" + (event->getDesc()) + "</p>";
+	(this->result) += "<p> In collaboration with " + (event->getCollaborators()) + "</p>";
 }
 
 email_reader::~email_reader() {
