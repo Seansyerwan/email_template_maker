@@ -51,9 +51,9 @@ void if_email_reader_correct_then_pass_event_generic() {
 
 	email_reader_tool->format(basic_event);
 
-	std::cout << email_reader_tool->getResult() << std::endl;
 
-	if (email_reader_tool->getResult() != "<h3>" + name + "</h3>\n\n" + "<p>" + desc + "</p>\n") {
+	
+	if (email_reader_tool->getResult()[0] != "<h3>" + name + "</h3>\n\n" + "<p>" + desc + "</p>\n") {
 		std::cout << "if_email_reader_correct_then_pass_event_generic FAILED" << std::endl;
 	}
 	else {
@@ -74,9 +74,11 @@ void if_email_reader_correct_then_pass_event_special() {
 
 	email_reader_tool->format(basic_event);
 
-	std::cout << email_reader_tool->getResult() << std::endl;
+	for (std::string res : email_reader_tool->getResult()) {
+		std::cout << res << std::endl;
+	}
 
-	if (email_reader_tool->getResult() != "<h3>" + name + "</h3>\n\n" + "<h4> In collaboration with " + collaborators + "</h4>\n" + "<p>" + desc + "</p>\n") {
+	if (email_reader_tool->getResult()[0] != "<h3>" + name + "</h3>\n\n" + "<h4> In collaboration with " + collaborators + "</h4>\n" + "<p>" + desc + "</p>\n") {
 		std::cout << "if_email_reader_correct_then_pass_event_special FAILED" << std::endl;
 	}
 	else {

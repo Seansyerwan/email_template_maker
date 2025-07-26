@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 #include "email_template.h"
 
 
@@ -113,8 +114,10 @@ email_reader::email_reader() {}
 * @return Formatted version of both name and description of event.
 */
 void email_reader::format(event_generic* event) {
-	(this->result) += "<h3>" + (event->getName()) + "</h3>\n\n";
-	(this->result) += "<p>" + (event->getDesc()) + "</p>\n";
+	std::string result = "";
+	result += "<h3>" + (event->getName()) + "</h3>\n\n";
+	result += "<p>" + (event->getDesc()) + "</p>\n";
+	this->result.push_back(result);
 }
 
 
@@ -124,9 +127,11 @@ void email_reader::format(event_generic* event) {
 * @return N\A
 */
 void email_reader::format(event_special* event) {
-	(this->result) += "<h3>" + (event->getName()) + "</h3>\n\n";
-	(this->result) += "<h4> In collaboration with " + (event->getCollaborators()) + "</h4>\n";
-	(this->result) += "<p>" + (event->getDesc()) + "</p>\n";
+	std::string result = "";
+	result += "<h3>" + (event->getName()) + "</h3>\n\n";
+	result += "<h4> In collaboration with " + (event->getCollaborators()) + "</h4>\n";
+	result += "<p>" + (event->getDesc()) + "</p>\n";
+	this->result.push_back(result);
 	
 }
 
@@ -136,7 +141,7 @@ void email_reader::format(event_special* event) {
 * @param N\A
 * @return Formatted data from previous emails
 */
-std::string email_reader::getResult() {
+std::vector<std::string> email_reader::getResult() {
 	return this->result;
 }
 

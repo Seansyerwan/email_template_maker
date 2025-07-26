@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 class email_reader;
 
@@ -32,8 +33,8 @@ public:
 	email_reader();
 	void format(event_generic* event);
 	void format(event_special* event);
-	std::string getResult();
+	std::vector<std::string> getResult();
 	~email_reader();
 protected:
-	std::string result;
+	std::vector<std::string> result;
 };
