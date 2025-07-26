@@ -121,7 +121,7 @@ void email_reader::format(event_generic* event) {
 /*
 * Format method for generic event
 * @param event_special pointer
-* @return Formatted version of both name and description of event.
+* @return N\A
 */
 void email_reader::format(event_special* event) {
 	(this->result) += "<h3>" + (event->getName()) + "</h3>\n\n";
@@ -129,6 +129,21 @@ void email_reader::format(event_special* event) {
 	(this->result) += "<p> In collaboration with " + (event->getCollaborators()) + "</p>";
 }
 
+
+/*
+* Getter method for formatted text
+* @param N\A
+* @return Formatted data from previous emails
+*/
+std::string email_reader::getResult() {
+	return this->result;
+}
+
+/*
+* Destructor for email reader object.
+* @param N\A
+* @return N\A
+*/
 email_reader::~email_reader() {
 	std::cout << "email_reader deleted" << std::endl;
 }

@@ -32,6 +32,7 @@ public:
 	email_reader();
 	void format(event_generic* event);
 	void format(event_special* event);
+	std::string getResult();
 	~email_reader();
 protected:
 	std::string result;
