@@ -53,7 +53,7 @@ void if_email_reader_correct_then_pass_event_generic() {
 
 	std::cout << email_reader_tool->getResult() << std::endl;
 
-	if (email_reader_tool->getResult() != "<h3>" + name + "</h3>\n\n" + "<p>" + desc + "</p>") {
+	if (email_reader_tool->getResult() != "<h3>" + name + "</h3>\n\n" + "<p>" + desc + "</p>\n") {
 		std::cout << "if_email_reader_correct_then_pass_event_generic FAILED" << std::endl;
 	}
 	else {
@@ -64,10 +64,35 @@ void if_email_reader_correct_then_pass_event_generic() {
 }
 
 
+void if_email_reader_correct_then_pass_event_special() {
+	std::string name = "Games night";
+	std::string desc = "An event which takes place from 6pm until 10pm in the boardroom.";
+	std::string collaborators = "Games Society";
+	event_special* basic_event = new event_special(name, desc, collaborators);
+
+	email_reader* email_reader_tool = new email_reader();
+
+	email_reader_tool->format(basic_event);
+
+	std::cout << email_reader_tool->getResult() << std::endl;
+
+	if (email_reader_tool->getResult() != "<h3>" + name + "</h3>\n\n" + "<h4> In collaboration with " + collaborators + "</h4>\n" + "<p>" + desc + "</p>\n") {
+		std::cout << "if_email_reader_correct_then_pass_event_special FAILED" << std::endl;
+	}
+	else {
+		std::cout << "if_email_reader_correct_then_pass_event_special PASSED" << std::endl;
+	}
+	delete email_reader_tool;
+	delete basic_event;
+}
+
+
+
 int main() {
 	if_event_generic_complete_then_pass();
 	if_event_special_complete_then_pass();
 
 	if_email_reader_correct_then_pass_event_generic();
+	if_email_reader_correct_then_pass_event_special();
 	return 0;
 }

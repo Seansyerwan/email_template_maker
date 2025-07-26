@@ -114,7 +114,7 @@ email_reader::email_reader() {}
 */
 void email_reader::format(event_generic* event) {
 	(this->result) += "<h3>" + (event->getName()) + "</h3>\n\n";
-	(this->result) += "<p>" + (event->getDesc()) + "</p>";
+	(this->result) += "<p>" + (event->getDesc()) + "</p>\n";
 }
 
 
@@ -125,8 +125,9 @@ void email_reader::format(event_generic* event) {
 */
 void email_reader::format(event_special* event) {
 	(this->result) += "<h3>" + (event->getName()) + "</h3>\n\n";
-	(this->result) += "<p>" + (event->getDesc()) + "</p>";
-	(this->result) += "<p> In collaboration with " + (event->getCollaborators()) + "</p>";
+	(this->result) += "<h4> In collaboration with " + (event->getCollaborators()) + "</h4>\n";
+	(this->result) += "<p>" + (event->getDesc()) + "</p>\n";
+	
 }
 
 
