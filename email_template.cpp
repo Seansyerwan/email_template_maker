@@ -1,8 +1,14 @@
 #include <iostream>
+#include <vector>
+#include <string>
 #include "email_template.h"
 
 
-
+/*
+* Constructor method for event_generic
+* @param N\A
+* @return generic event
+*/
 event_generic::event_generic() {};
 
 /*
@@ -113,8 +119,10 @@ email_reader::email_reader() {}
 * @return Formatted version of both name and description of event.
 */
 void email_reader::format(event_generic* event) {
-	(this->result) += "<h3>" + (event->getName()) + "</h3>\n\n";
-	(this->result) += "<p>" + (event->getDesc()) + "</p>\n";
+	std::string result = "";
+	result += "<h3>" + (event->getName()) + "</h3>\n\n";
+	result += "<p>" + (event->getDesc()) + "</p>\n";
+	this->result.push_back(result);
 }
 
 
@@ -124,9 +132,11 @@ void email_reader::format(event_generic* event) {
 * @return N\A
 */
 void email_reader::format(event_special* event) {
-	(this->result) += "<h3>" + (event->getName()) + "</h3>\n\n";
-	(this->result) += "<h4> In collaboration with " + (event->getCollaborators()) + "</h4>\n";
-	(this->result) += "<p>" + (event->getDesc()) + "</p>\n";
+	std::string result = "";
+	result += "<h3>" + (event->getName()) + "</h3>\n\n";
+	result += "<h4>In collaboration with " + (event->getCollaborators()) + "</h4>\n";
+	result += "<p>" + (event->getDesc()) + "</p>\n";
+	this->result.push_back(result);
 	
 }
 
@@ -136,8 +146,167 @@ void email_reader::format(event_special* event) {
 * @param N\A
 * @return Formatted data from previous emails
 */
-std::string email_reader::getResult() {
+std::vector<std::string> email_reader::getResult() {
 	return this->result;
+}
+
+
+/*Function for creating results for a generic event
+* @param email_reader* email_maker
+* @result N\A
+*/
+void email_reader::result_creator_generic() {
+	std::string name = "";
+	std::string desc = "";
+	std::cout << "\nPlease input the name of the event here: ";
+	std::getline(std::cin, name);
+	std::cout << "\nPlease input the description of the event here: ";
+	std::getline(std::cin, desc);
+
+	//create a new event, then format	
+	event_generic* event = new event_generic(name, desc);
+	this->format(event);
+}
+
+
+/*
+* Function for creating results for special event
+* @param email_reader* email_maker
+* @result N\A
+*/
+void email_reader::result_creator_special() {
+	std::string name = "";
+	std::string desc = "";
+	std::string collaborators = "";
+
+	std::cout << "\nPlease input the name of the event here: ";
+	std::getline(std::cin, name);
+	std::cout << "\nPlease input the description of the event here: ";
+	std::getline(std::cin, desc);
+	std::cout << "\nPlease input the collaborators of the event here: ";
+	std::cin.clear();
+	std::getline(std::cin, collaborators);
+
+	//create a new event, then format
+	event_special* event = new event_special(name, desc, collaborators);
+	this->format(event);
+}
+
+/*
+* Method for updating a specific part of result for special event
+* @param N\A
+* @return Modified version of results
+*/
+void email_reader::modify_result() {
+	unsigned int overall_index = 0; //placeholder value
+
+	std::cout << "What event would you like to modify?" << std::endl;
+
+	//loop through the results
+	unsigned int currentPage = 0;
+		while (true) {
+			std::cout << "Which page do you wish to choose" << std::endl;
+			for (int i = 0; i < (this->result.size() / 10)+1; i++) {
+				std::cout << "Page " + std::to_string(i+1) << std::endl;
+			}
+
+			
+			unsigned int index = 0;//choice for the page
+			std::cin >> index; 
+
+			index -= 1;
+			if (index <= (this->result.size() - 1)) {
+				currentPage = index;
+
+				std::cout << "Page " + std::to_string(currentPage + 1) + " selected." << std::endl;
+				for (int i = currentPage*10; i < currentPage+10 && i < this->result.size(); i++) {
+					std::cout << std::to_string((i % 10)+1) + this->result[i].substr(this->result[i].find("<h3>"), this->result[i].find("</h3>")) << std::endl;
+				}
+				std::cout << "Which event do you wish to edit?" << std::endl;
+				std::cin >> index;
+
+				std::cout << index << std::endl;
+
+				index -= 1; //decrement to keep it within range
+				if (index < 10 && index < this->result.size()) {
+					overall_index = index; //swap value
+					
+					break;
+				}
+
+			}
+			std::cout << "Invalid input chosen, please try again" << std::endl;
+		}
+
+	
+	
+	//print choice out for the user
+	std::cout << "You have selected " << overall_index << std::endl;
+	std::cout << this->result[overall_index] <<std::endl;
+
+	char choice = ' ';
+	//user knows what they chose, so if it was a mistake, they can choose 4.
+	std::cout << "What do you wish to modify for index " + overall_index << " ?\n1:name\n2:desc\n3:collaborators\n4:None of the above\n" << std::endl;
+	std::cin >> choice; 
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+	//if the choice is one, two or three
+	if (choice == '1' || choice == '2' || choice == '3') {
+
+		//should a user try to modify collaborators when not present, it is then ignored.
+		if (choice == '3') { 
+			int present = this->result[overall_index].find("<h4>");
+			if (present == -1) {
+				std::cout << "No collaborators! Try again." << std::endl;
+				return;
+			}
+		}
+
+		std::string res = "";
+		std::cout << "Please input your replacement for your choice:";
+		std::getline(std::cin, res);
+
+		//we either insert the replacement in the name, the description or the collaborators section. 
+		std::string temp = choice == '1' ? "<h3>" + res +
+			this->result[overall_index].substr(this->result[overall_index].find("</h3>")) : choice == '2' ? "</h3>" +
+			this->result[overall_index].substr(0, this->result[overall_index].find("</h3>")) + "<p>" + res + "</p>" :
+		  this->result[overall_index].substr(0, this->result[overall_index].find("<h4>")) + "<h4>In collaboration with " + res + this->result[overall_index].substr(this->result[overall_index].find("</h4>"));
+
+		this->result[overall_index] = temp;
+	}
+}
+
+/*
+* Method for updating a specific part of result for special event
+* @param unsigned int index, char type, std::string replacement
+* @return Modified at index
+*/
+void email_reader::modify_result(unsigned int index, char type, std::string replacement) {
+	if (this->result.size() - 1 < index) {
+		std::cout << "Invalid input: out of range";
+		return;
+	}
+	
+	//if the choice is one, two or three
+	if (type == '1' || type == '2' || type == '3') {
+
+		//should a user try to modify collaborators when not present, it is then ignored.
+		if (type == '3') {
+			int present = this->result[index].find("<h4>");
+			if (present == -1) {
+				std::cout << "No collaborators! Try again." << std::endl;
+				return;
+			}
+		}
+
+		//we either insert the replacement in the name, the description or the collaborators section. 
+		std::string temp = type == '1' ? "<h3>" + replacement +
+			this->result[index].substr(this->result[index].find("</h3>")) : type == '2' ? "</h3>" +
+			this->result[index].substr(0, this->result[index].find("</h3>")) + "<p>" + replacement + "</p>" :
+			this->result[index].substr(0, this->result[index].find("<h4>")) + "<h4>In collaboration with " + replacement + this->result[index].substr(this->result[index].find("</h4>"));
+
+		this->result[index] = temp;
+	}
 }
 
 /*

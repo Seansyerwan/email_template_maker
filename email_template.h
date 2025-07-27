@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 class email_reader;
 
@@ -10,6 +11,7 @@ public:
 	void setDesc(std::string desc);
 	std::string getName();
 	std::string getDesc();
+
 	~event_generic();
 protected:
 	std::string name;
@@ -32,8 +34,12 @@ public:
 	email_reader();
 	void format(event_generic* event);
 	void format(event_special* event);
-	std::string getResult();
+	std::vector<std::string> getResult();
+	void modify_result();
+	void modify_result(unsigned int index, char type, std::string replacement);
+	void result_creator_generic();
+	void result_creator_special();
 	~email_reader();
 protected:
-	std::string result;
+	std::vector<std::string> result;
 };
