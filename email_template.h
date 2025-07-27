@@ -36,7 +36,7 @@ public:
 	void format(event_special* event);
 	std::vector<std::string> getResult();
 	void modify_result();
-	void modify_result(unsigned int index, char type, std::string replacement);
+	void delete_event();
 	void result_creator_generic();
 	void result_creator_special();
 	~email_reader();

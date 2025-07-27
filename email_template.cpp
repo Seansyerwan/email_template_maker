@@ -239,7 +239,6 @@ void email_reader::modify_result() {
 		}
 
 	
-	
 	//print choice out for the user
 	std::cout << "You have selected " << overall_index << std::endl;
 	std::cout << this->result[overall_index] <<std::endl;
@@ -276,39 +275,70 @@ void email_reader::modify_result() {
 	}
 }
 
-/*
-* Method for updating a specific part of result for special event
-* @param unsigned int index, char type, std::string replacement
-* @return Modified at index
-*/
-void email_reader::modify_result(unsigned int index, char type, std::string replacement) {
-	if (this->result.size() - 1 < index) {
-		std::cout << "Invalid input: out of range";
-		return;
-	}
-	
-	//if the choice is one, two or three
-	if (type == '1' || type == '2' || type == '3') {
 
-		//should a user try to modify collaborators when not present, it is then ignored.
-		if (type == '3') {
-			int present = this->result[index].find("<h4>");
-			if (present == -1) {
-				std::cout << "No collaborators! Try again." << std::endl;
-				return;
-			}
+/*
+* Method for the purpose of deleting an event
+* @param N\A
+* @return email with a part of the email removed.
+*/
+void email_reader::delete_event() {
+	unsigned int overall_index = 0; //placeholder value
+
+	std::cout << "What event would you like to modify?" << std::endl;
+
+	//loop through the results
+	unsigned int currentPage = 0;
+	while (true) {
+		std::cout << "Which page do you wish to choose" << std::endl;
+		for (int i = 0; i < (this->result.size() / 10) + 1; i++) {
+			std::cout << "Page " + std::to_string(i + 1) << std::endl;
 		}
 
-		//we either insert the replacement in the name, the description or the collaborators section. 
-		std::string temp = type == '1' ? "<h3>" + replacement +
-			this->result[index].substr(this->result[index].find("</h3>")) : type == '2' ? "</h3>" +
-			this->result[index].substr(0, this->result[index].find("</h3>")) + "<p>" + replacement + "</p>" :
-			this->result[index].substr(0, this->result[index].find("<h4>")) + "<h4>In collaboration with " + replacement + this->result[index].substr(this->result[index].find("</h4>"));
 
-		this->result[index] = temp;
+		unsigned int index = 0;//choice for the page
+		std::cin >> index;
+
+		index -= 1;
+		if (index <= (this->result.size() - 1)) {
+			currentPage = index;
+
+			std::cout << "Page " + std::to_string(currentPage + 1) + " selected." << std::endl;
+			for (int i = currentPage * 10; i < currentPage + 10 && i < this->result.size(); i++) {
+				std::cout << std::to_string((i % 10) + 1) + this->result[i].substr(this->result[i].find("<h3>"), this->result[i].find("</h3>")) << std::endl;
+			}
+			std::cout << "Which event do you wish to edit?" << std::endl;
+			std::cin >> index;
+
+			std::cout << index << std::endl;
+
+			index -= 1; //decrement to keep it within range
+			if (index < 10 && index < this->result.size()) {
+				overall_index = index; //swap value
+
+				break;
+			}
+
+		}
+		std::cout << "Invalid input chosen, please try again" << std::endl;
 	}
-}
 
+
+	//print choice out for the user
+	std::cout << "You have selected " << overall_index << std::endl;
+	std::cout << this->result[overall_index] << std::endl;
+
+	char choice = ' ';
+	//user knows what they chose, so if it was a mistake, they can choose 4.
+	std::cout << "Are you sure to delete event " + overall_index << " ?\nY/N:";
+	std::cin >> choice;
+
+	if (choice == 'Y' || choice == 'y') {
+		this->result.erase(this->result.begin() + overall_index, this->result.begin() + overall_index + 1);
+	}
+
+	std::cout << "Event " + std::to_string(overall_index) + " deleted." << std::endl;
+
+}
 /*
 * Destructor for email reader object.
 * @param N\A
