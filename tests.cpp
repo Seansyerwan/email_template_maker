@@ -111,7 +111,7 @@ void if_email_reader_modify_result_generic_correct_then_pass() {
 
 	email_reader_tool->format(basic_event);
 
-	email_reader_tool->modify_result(0);
+	email_reader_tool->modify_result();
 
 	std::cout << email_reader_tool->getResult()[0] << std::endl;
 
@@ -142,7 +142,7 @@ void if_email_reader_modify_result_special_correct_then_pass() {
 
 	email_reader_tool->format(basic_event);
 
-	email_reader_tool->modify_result(0);
+	email_reader_tool->modify_result();
 
 	std::cout << email_reader_tool->getResult()[0] << std::endl;
 
@@ -161,7 +161,7 @@ void if_email_reader_modify_result_special_correct_then_pass() {
 }
 
 
-int main() {
+int tests() {
 	if_event_generic_complete_then_pass();
 	if_event_special_complete_then_pass();
 
