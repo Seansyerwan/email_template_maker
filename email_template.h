@@ -36,9 +36,11 @@ public:
 	void format(event_special* event);
 	std::vector<std::string> getResult();
 	void modify_result();
-	void delete_event();
 	void result_creator_generic();
 	void result_creator_special();
+	void delete_event();
+	void save_email();
+	void retrieve_email();
 	~email_reader();
 protected:
 	std::vector<std::string> result;

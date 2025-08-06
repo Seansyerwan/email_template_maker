@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <string>
 #include "email_template.h"
@@ -121,7 +122,7 @@ email_reader::email_reader() {}
 void email_reader::format(event_generic* event) {
 	std::string result = "";
 	result += "<h3>" + (event->getName()) + "</h3>\n\n";
-	result += "<p>" + (event->getDesc()) + "</p>\n";
+	result += "<p>" + (event->getDesc()) + "</p>\n\n";
 	this->result.push_back(result);
 }
 
@@ -135,7 +136,7 @@ void email_reader::format(event_special* event) {
 	std::string result = "";
 	result += "<h3>" + (event->getName()) + "</h3>\n\n";
 	result += "<h4>In collaboration with " + (event->getCollaborators()) + "</h4>\n";
-	result += "<p>" + (event->getDesc()) + "</p>\n";
+	result += "<p>" + (event->getDesc()) + "</p>\n\n";
 	this->result.push_back(result);
 	
 }
@@ -339,6 +340,48 @@ void email_reader::delete_event() {
 	std::cout << "Event " + std::to_string(overall_index) + " deleted." << std::endl;
 
 }
+
+/*
+* Method for saving event to external file
+* @param email_reader object with data inserted
+* @return N\A
+*/
+void email_reader::save_email() {
+	if (this->result.size() == 0) {
+		std::cout << "Nothing to save. Please try again later." << std::endl;
+		return;
+	}
+
+	std::ofstream email_data("event_data.txt");
+
+	//for each event in the result vector, write to the file
+	for (std::string line : this->result) {
+		email_data << line;
+	}
+
+	//close when done
+	email_data.close();
+	
+}
+
+/*
+* Method for retrieving event data from external file
+* @param email_reader object with data inserted
+* @return N\A
+*/
+void email_reader::retrieve_email() {
+	std::string output_data;
+	std::ifstream iFile("event_data.txt");
+
+	//for each line in the file, open.
+	while (std::getline(iFile, output_data)) {
+		this->result.push_back(output_data);
+		std::cout << output_data;
+	}
+	
+	iFile.close();
+}
+
 /*
 * Destructor for email reader object.
 * @param N\A
