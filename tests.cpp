@@ -5,11 +5,13 @@
 
 void if_event_generic_complete_then_pass() {
 	std::string name = "Coffee Morning";
-	std::string desc = "An event which takes place from 10am until 12pm in the hall.";
-	event_generic* basic_event = new event_generic(name, desc); 
+	std::string desc = "An event.";
+	std::string time = "from 10am until 12pm";
+	std::string location = "in the hall";
+	event_generic* basic_event = new event_generic(name, desc, time, location); 
 
 	//compare the outputs of the getters compared to what was inserted.
-	if (basic_event->getName() != "Coffee Morning" || basic_event->getDesc() != "An event which takes place from 10am until 12pm in the hall.") {
+	if (basic_event->getName() != "Coffee Morning" || basic_event->getDesc() != "An event.") {
 		std::cout << "if_event_generic_complete_then_pass FAILED" << std::endl;
 	}
 	else {
@@ -26,8 +28,10 @@ void if_event_generic_complete_then_pass() {
 void if_event_special_complete_then_pass() {
 	std::string name = "Games night";
 	std::string desc = "An event which takes place from 6pm until 10pm in the boardroom.";
+	std::string time = "from 10am until 12pm";
+	std::string location = "in the hall";
 	std::string collaborators = "Games Society";
-	event_special* basic_event = new event_special(name, desc, collaborators);
+	event_special* basic_event = new event_special(name, desc, time, location, collaborators);
 
 	//compare the outputs of the getters compared to what was inserted.
 	if (basic_event->getName() != "Games night" || 
@@ -48,8 +52,10 @@ void if_event_special_complete_then_pass() {
 */
 void if_email_reader_correct_then_pass_event_generic() {
 	std::string name = "Coffee Morning";
-	std::string desc = "An event which takes place from 10am until 12pm in the hall.";
-	event_generic* basic_event = new event_generic(name, desc);
+	std::string desc = "An event.";
+	std::string time = "from 10am until 12pm";
+	std::string location = "in the hall";
+	event_generic* basic_event = new event_generic(name, desc, time, location);
 
 	email_reader* email_reader_tool = new email_reader();
 
@@ -74,10 +80,12 @@ void if_email_reader_correct_then_pass_event_generic() {
 * @result passes if output is to be expected.
 */
 void if_email_reader_correct_then_pass_event_special() {
-	std::string name = "Games night";
-	std::string desc = "An event which takes place from 6pm until 10pm in the boardroom.";
+	std::string name = "Coffee Morning";
+	std::string desc = "An event.";
+	std::string time = "from 10am until 12pm";
+	std::string location = "in the hall";
 	std::string collaborators = "Games Society";
-	event_special* basic_event = new event_special(name, desc, collaborators);
+	event_special* basic_event = new event_special(name, desc, time, location, collaborators);
 
 	email_reader* email_reader_tool = new email_reader();
 
@@ -104,8 +112,10 @@ void if_email_reader_correct_then_pass_event_special() {
 */
 void if_email_reader_modify_result_generic_correct_then_pass() {
 	std::string name = "Coffee Morning";
-	std::string desc = "An event which takes place from 10am until 12pm in the hall.";
-	event_generic* basic_event = new event_generic(name, desc);
+	std::string desc = "An event.";
+	std::string time = "from 10am until 12pm";
+	std::string location = "in the hall";
+	event_generic* basic_event = new event_generic(name, desc, time, location);
 
 	email_reader* email_reader_tool = new email_reader();
 
@@ -134,9 +144,11 @@ void if_email_reader_modify_result_generic_correct_then_pass() {
 */
 void if_email_reader_modify_result_special_correct_then_pass() {
 	std::string name = "Coffee Morning";
-	std::string desc = "An event which takes place from 10am until 12pm in the hall.";
+	std::string desc = "An event.";
+	std::string time = "from 10am until 12pm";
+	std::string location = "in the hall";
 	std::string collaborators = "Games Soc";
-	event_special* basic_event = new event_special(name, desc,collaborators);
+	event_special* basic_event = new event_special(name, desc, time, location, collaborators);
 
 	email_reader* email_reader_tool = new email_reader();
 
