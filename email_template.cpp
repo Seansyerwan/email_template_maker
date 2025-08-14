@@ -2,6 +2,9 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <ctime>
+#include <ratio>
+#include <chrono>
 #include "email_template.h"
 
 
@@ -195,7 +198,23 @@ std::vector<std::string> email_reader::getResult() {
 	return this->result;
 }
 
+/*
+* Function to help with creating results for events
+* @param string& name, string& desc, string& time, string& location
+* @return data filled from above
+*/
+void result_creator_helper(std::string& name, std::string& desc, std::string& time, std::string& location) {
+	std::cout << "\nPlease input the name of the event here: ";
+	std::getline(std::cin, name);
+	std::cout << "\nPlease input the description of the event here: ";
+	std::getline(std::cin, desc);
 
+	std::cout << "\What day is this event taking place next week?: ";
+	std::getline(std::cin, time);
+
+	std::cout << "\Where is this event taking place?: ";
+	std::getline(std::cin, location);
+}
 
 /*Function for creating results for a generic event
 * @param email_reader* email_maker
@@ -207,19 +226,12 @@ void email_reader::result_creator_generic() {
 	std::string time = "";
 	std::string location = "";
 
-	std::cout << "\nPlease input the name of the event here: ";
-	std::getline(std::cin, name);
-	std::cout << "\nPlease input the description of the event here: ";
-	std::getline(std::cin, desc);
-
-	std::cout << "\What day is this event taking place next week?: ";
-	std::getline(std::cin, time);
-
-	std::cout << "\Where is this event taking place?: ";
-	std::getline(std::cin, location);
+	
 	//create a new event, then format	
+	result_creator_helper(name, desc, time, location);
 	event_generic* event = new event_generic(name, desc, time, location);
 	this->format(event);
+	std::cin.clear();
 }
 
 /*
@@ -234,19 +246,12 @@ void email_reader::result_creator_special() {
 	std::string location = "";
 	std::string collaborators = "";
 
-	std::cout << "\nPlease input the name of the event here: ";
-	std::getline(std::cin, name);
-	std::cout << "\nPlease input the description of the event here: ";
-	std::getline(std::cin, desc);
+	result_creator_helper(name, desc, time, location);
+
 	std::cout << "\nPlease input the collaborators of the event here: ";
 	std::getline(std::cin, collaborators);
 
-	std::cout << "\What day is this event taking place next week?: ";
-	std::getline(std::cin, time);
-
-	std::cout << "\Where is this event taking place?: ";
-	std::getline(std::cin, location);
-
+	
 	std::cin.clear();
 
 	//create a new event, then format
@@ -254,6 +259,50 @@ void email_reader::result_creator_special() {
 	this->format(event);
 }
 
+/*
+* Finds index of event
+*/
+int email_reader::find_event() {
+	unsigned int overall_index = 0; //placeholder value
+
+	//loop through the results
+	unsigned int currentPage = 0;
+	while (true) {
+		std::cout << "Which page do you wish to choose" << std::endl;
+		for (int i = 0; i < (this->result.size() / 10) + 1; i++) {
+			std::cout << "Page " + std::to_string(i + 1) << std::endl;
+		}
+
+
+		unsigned int index = 0;//choice for the page
+		std::cin >> index;
+
+		index -= 1;
+		if (index <= (this->result.size() - 1)) {
+			currentPage = index;
+
+			std::cout << "Page " + std::to_string(currentPage + 1) + " selected." << std::endl;
+			for (int i = currentPage * 10; i < currentPage + 10 && i < this->result.size(); i++) {
+				std::cout << std::to_string((i % 10) + 1) + this->result[i].substr(this->result[i].find("<h3>"), this->result[i].find("</h3>")) << std::endl;
+			}
+			std::cout << "Which event do you wish to edit?" << std::endl;
+			std::cin >> index;
+
+			std::cout << index << std::endl;
+
+			index -= 1; //decrement to keep it within range
+			if (index < 10 && index < this->result.size()) {
+				overall_index = index; //swap value
+
+				break;
+			}
+
+		}
+		std::cout << "Invalid input chosen, please try again" << std::endl;
+	}
+
+	return overall_index;
+}
 /*
 * Method for updating a specific part of result for special event
 * @param N\A
@@ -263,42 +312,8 @@ void email_reader::modify_result() {
 	unsigned int overall_index = 0; //placeholder value
 
 	std::cout << "What event would you like to modify?" << std::endl;
-
-	//loop through the results
-	unsigned int currentPage = 0;
-		while (true) {
-			std::cout << "Which page do you wish to choose" << std::endl;
-			for (int i = 0; i < (this->result.size() / 10)+1; i++) {
-				std::cout << "Page " + std::to_string(i+1) << std::endl;
-			}
-
-			
-			unsigned int index = 0;//choice for the page
-			std::cin >> index; 
-
-			index -= 1;
-			if (index <= (this->result.size() - 1)) {
-				currentPage = index;
-
-				std::cout << "Page " + std::to_string(currentPage + 1) + " selected." << std::endl;
-				for (int i = currentPage*10; i < currentPage+10 && i < this->result.size(); i++) {
-					std::cout << std::to_string((i % 10)+1) + this->result[i].substr(this->result[i].find("<h3>"), this->result[i].find("</h3>")) << std::endl;
-				}
-				std::cout << "Which event do you wish to edit?" << std::endl;
-				std::cin >> index;
-
-				std::cout << index << std::endl;
-
-				index -= 1; //decrement to keep it within range
-				if (index < 10 && index < this->result.size()) {
-					overall_index = index; //swap value
-					
-					break;
-				}
-
-			}
-			std::cout << "Invalid input chosen, please try again" << std::endl;
-		}
+	
+	overall_index = this->find_event();
 
 	
 	//print choice out for the user
@@ -365,43 +380,7 @@ void email_reader::delete_event() {
 
 	std::cout << "What event would you like to modify?" << std::endl;
 
-	//loop through the results
-	unsigned int currentPage = 0;
-	while (true) {
-		std::cout << "Which page do you wish to choose" << std::endl;
-		for (int i = 0; i < (this->result.size() / 10) + 1; i++) {
-			std::cout << "Page " + std::to_string(i + 1) << std::endl;
-		}
-
-
-		unsigned int index = 0;//choice for the page
-		std::cin >> index;
-
-		index -= 1;
-		if (index <= (this->result.size() - 1)) {
-			currentPage = index;
-
-			std::cout << "Page " + std::to_string(currentPage + 1) + " selected." << std::endl;
-			for (int i = currentPage * 10; i < currentPage + 10 && i < this->result.size(); i++) {
-				std::cout << std::to_string((i % 10) + 1) + this->result[i].substr(this->result[i].find("<h3>"), this->result[i].find("</h3>")) << std::endl;
-			}
-			std::cout << "Which event do you wish to edit?" << std::endl;
-			std::cin >> index;
-
-			std::cout << index << std::endl;
-
-			index -= 1; //decrement to keep it within range
-			if (index < 10 && index < this->result.size()) {
-				overall_index = index; //swap value
-
-				break;
-			}
-
-		}
-		std::cout << "Invalid input chosen, please try again" << std::endl;
-	}
-
-
+	overall_index = this->find_event();
 	//print choice out for the user
 	std::cout << "You have selected " << overall_index << std::endl;
 	std::cout << this->result[overall_index] << std::endl;

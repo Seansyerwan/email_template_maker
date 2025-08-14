@@ -43,6 +43,7 @@ public:
 	void modify_result();
 	void result_creator_generic();
 	void result_creator_special();
+	int find_event();
 	void delete_event();
 	void save_email();
 	void retrieve_email();
