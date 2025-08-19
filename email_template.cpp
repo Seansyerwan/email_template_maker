@@ -462,9 +462,11 @@ void email_reader::retrieve_email() {
 		size_t pos = 0;
 
 		while (true) {
+			//start of string to filter for date.
 			size_t start = output_data.find("<mark>", pos);
 			if (start == std::string::npos) break;
 
+			//Appending all of the string prior to the string
 			updated += output_data.substr(pos, start - pos);
 
 			size_t end = output_data.find("</mark>", start);
@@ -477,8 +479,11 @@ void email_reader::retrieve_email() {
 
 			std::string mark_content = output_data.substr(start + 6, end - (start + 6));
 			size_t space_pos = mark_content.find(' ');
+
+			//if theres any day of the week located, we ignore
 			std::string date_str = (space_pos != std::string::npos) ? mark_content.substr(space_pos + 1) : mark_content;
 
+			//and calling the day of week function to account for new day
 			updated += "<mark>" + day_of_week(date_str, true) + "</mark>";
 			pos = end + 7;
 		}
@@ -487,6 +492,8 @@ void email_reader::retrieve_email() {
 			updated += output_data.substr(pos);
 
 		output_data = std::move(updated);
+
+		//appending to the string vector
 		this->result.push_back(output_data);
 		std::cout << output_data;
 	}
