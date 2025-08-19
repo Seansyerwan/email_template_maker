@@ -2,11 +2,37 @@
 #include <fstream>
 #include <vector>
 #include <string>
-#include <ctime>
-#include <ratio>
 #include <chrono>
 #include "email_template.h"
+#include <regex>
 
+
+const std::string days[] = {
+		"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+};
+
+std::string day_of_week(std::string date, bool is_recurring) {
+
+	//we will use smatch to match the data here
+	std::smatch date_match;
+	std::regex_search(date, date_match, std::regex(R"((\d{1,2})\/(\d{1,2})\/(\d{4}))"));
+
+	unsigned int dd = std::stoul(date_match[1]), mm = std::stoul(date_match[2]);
+	int yy = std::stoul(date_match[3]);
+	//goal of this is to get the next iteration of a date.	
+	std::chrono::year_month_day ymd{std::chrono::year{yy}, std::chrono::month{mm}, std::chrono::day{dd}};
+
+	//get the date for next week by adding 7 days to the date above. if it is a recurring event, then we just add 7 days on. 
+	std::chrono::sys_days next_iteration = is_recurring ? std::chrono::sys_days{ymd} + std::chrono::days{7} : std::chrono::sys_days{ymd};
+
+	//the specific date....
+	std::chrono::year_month_day next_date{ next_iteration };
+	//get the specific day (from 0-6)
+	std::chrono::weekday wd{next_iteration};
+
+	return days[wd.c_encoding()] + " " + std::to_string(unsigned(next_date.day())) + "/" + std::to_string(unsigned(next_date.month())) + "/" + std::to_string(int(next_date.year()));
+	
+}
 
 /*
 * Constructor method for event_generic
@@ -54,7 +80,7 @@ void event_generic::setDesc(std::string desc) {
 * @return Updated time variable of event
 */
 void event_generic::setTime(std::string time) {
-	this->time = time;
+	this->time = day_of_week(time, false);
 }
 
 
@@ -64,7 +90,7 @@ void event_generic::setTime(std::string time) {
 * @return Updated location variable of event
 */
 void event_generic::setLocation(std::string location) {
-	this->location = "Taking place in " + location;
+	this->location = location;
 }
 
 /*
@@ -167,7 +193,7 @@ email_reader::email_reader() {}
 void email_reader::format(event_generic* event) {
 	std::string result = "";
 	result += "<h3>" + (event->getName()) + "</h3>\n\n";
-	result += "<p>" + (event->getDesc()) + "</p> <p>This event is taking place at <mark>" + (event->getTime()) + "</mark><b>" + (event->getLocation()) + "</b></p>\n\n";
+	result += "<p>" + (event->getDesc()) + "</p> <p>This event is taking place at <mark>" + (event->getTime()) + "</mark> <b>Located in " + (event->getLocation()) + "</b></p>\n\n";
 	result += "<hr>";
 	this->result.push_back(result);
 }
@@ -182,7 +208,7 @@ void email_reader::format(event_special* event) {
 	std::string result = "";
 	result += "<h3>" + (event->getName()) + "</h3>\n\n";
 	result += "<h4>In collaboration with " + (event->getCollaborators()) + "</h4>\n";
-	result += "<p>" + (event->getDesc()) + "</p> <p>This event is taking place at <mark>" + (event->getTime()) + "</mark><b>" + (event->getLocation()) + "</b></p>\n\n";
+	result += "<p>" + (event->getDesc()) + "</p> <p>This event is taking place at <mark>" + (event->getTime()) + "</mark> <b>Located in " + (event->getLocation()) + "</b></p>\n\n";
 	result += "<hr>";
 	this->result.push_back(result);
 	
@@ -209,7 +235,7 @@ void result_creator_helper(std::string& name, std::string& desc, std::string& ti
 	std::cout << "\nPlease input the description of the event here: ";
 	std::getline(std::cin, desc);
 
-	std::cout << "\What day is this event taking place next week?: ";
+	std::cout << "\What day is this event taking place next? (Please add in DD/MM/YYYY): ";
 	std::getline(std::cin, time);
 
 	std::cout << "\Where is this event taking place?: ";
@@ -261,6 +287,8 @@ void email_reader::result_creator_special() {
 
 /*
 * Finds index of event
+* @param N\A
+* @return index of input
 */
 int email_reader::find_event() {
 	unsigned int overall_index = 0; //placeholder value
@@ -303,6 +331,7 @@ int email_reader::find_event() {
 
 	return overall_index;
 }
+
 /*
 * Method for updating a specific part of result for special event
 * @param N\A
@@ -345,8 +374,6 @@ void email_reader::modify_result() {
 		std::string temp = "";
 		
 
-		//	result += "<p>" + (event->getDesc()) + "</p> <p>This event is taking place at <mark>" + (event->getTime()) + "</mark><b>" + (event->getLocation()) + "</b></p>\n\n";
-
 		//if else statement for what the user chose. 1 == name, 2 == desc, 3 == time, 4 == desc, 5 == collaborators.
 		if (choice == '1') {
 			temp = "<h3>" + res + this->result[overall_index].substr(this->result[overall_index].find("</h3>"));
@@ -355,7 +382,7 @@ void email_reader::modify_result() {
 			temp = "</h3>" + this->result[overall_index].substr(0, this->result[overall_index].find("</h3>")) + "<p>" + res + "</p>";
 		}
 		else if (choice == '3') {
-			temp = this->result[overall_index].substr(0, this->result[overall_index].find("<mark>")) + +"<mark>" + res + "" + this->result[overall_index].substr(this->result[overall_index].find("</mark>"));
+			temp = this->result[overall_index].substr(0, this->result[overall_index].find("<mark>")) + +"<mark>" + day_of_week(res,false) + "" + this->result[overall_index].substr(this->result[overall_index].find("</mark>"));
 		}
 		else if (choice == '4') {
 			temp = this->result[overall_index].substr(0, this->result[overall_index].find("<b>")) + res + this->result[overall_index].substr(this->result[overall_index].find("</b>"));
@@ -368,7 +395,6 @@ void email_reader::modify_result() {
 	}
 	else std::cout << "No valid input chosen, result remaining unmodified." << std::endl;
 }
-
 
 /*
 * Method for the purpose of deleting an event
@@ -432,9 +458,46 @@ void email_reader::retrieve_email() {
 
 	//for each line in the file, open.
 	while (std::getline(iFile, output_data)) {
+		std::string updated;
+		size_t pos = 0;
+
+		while (true) {
+			//start of string to filter for date.
+			size_t start = output_data.find("<mark>", pos);
+			if (start == std::string::npos) break;
+
+			//Appending all of the string prior to the string
+			updated += output_data.substr(pos, start - pos);
+
+			size_t end = output_data.find("</mark>", start);
+			if (end == std::string::npos) {
+				// if no closing tag, just append rest and exit
+				updated += output_data.substr(start);
+				pos = output_data.size();
+				break;
+			}
+
+			std::string mark_content = output_data.substr(start + 6, end - (start + 6));
+			size_t space_pos = mark_content.find(' ');
+
+			//if theres any day of the week located, we ignore
+			std::string date_str = (space_pos != std::string::npos) ? mark_content.substr(space_pos + 1) : mark_content;
+
+			//and calling the day of week function to account for new day
+			updated += "<mark>" + day_of_week(date_str, true) + "</mark>";
+			pos = end + 7;
+		}
+
+		if (pos < output_data.size())
+			updated += output_data.substr(pos);
+
+		output_data = std::move(updated);
+
+		//appending to the string vector
 		this->result.push_back(output_data);
 		std::cout << output_data;
 	}
+
 	
 	iFile.close();
 }
