@@ -47,6 +47,7 @@ public:
 	void delete_event();
 	void save_email();
 	void retrieve_email();
+	void shift_event();
 	~email_reader();
 protected:
 	std::vector<std::string> result;

@@ -297,7 +297,7 @@ int email_reader::find_event() {
 	unsigned int currentPage = 0;
 	while (true) {
 		std::cout << "Which page do you wish to choose" << std::endl;
-		for (int i = 0; i < (this->result.size() / 10) + 1; i++) {
+		for (int i = 0; i < (this->result.size() + 9)/10; i++) {
 			std::cout << "Page " + std::to_string(i + 1) << std::endl;
 		}
 
@@ -306,12 +306,19 @@ int email_reader::find_event() {
 		std::cin >> index;
 
 		index -= 1;
+
+		//if the index is within the range, we accept and continue on
 		if (index <= (this->result.size() - 1)) {
-			currentPage = index;
+			currentPage = index; //save the current page for now
 
 			std::cout << "Page " + std::to_string(currentPage + 1) + " selected." << std::endl;
-			for (int i = currentPage * 10; i < currentPage + 10 && i < this->result.size(); i++) {
-				std::cout << std::to_string((i % 10) + 1) + this->result[i].substr(this->result[i].find("<h3>"), this->result[i].find("</h3>")) << std::endl;
+
+		
+			for (int i = currentPage * 10; i < (currentPage*10)+10 && i < this->result.size(); i++) {
+				size_t start = this->result[i].find("<h3>");
+				size_t end = this->result[i].find("</h3>", start);
+
+				std::cout << std::to_string((i % 10) + 1) + " " + this->result[i].substr(start + 4, end - (start + 4)) << std::endl;
 			}
 			std::cout << "Which event do you wish to edit?" << std::endl;
 			std::cin >> index;
@@ -453,54 +460,113 @@ void email_reader::save_email() {
 * @return N\A
 */
 void email_reader::retrieve_email() {
-	std::string output_data;
+	this->result.clear();
 	std::ifstream iFile("event_data.txt");
+	//reading all characters from the file
+	std::string file_contents((std::istreambuf_iterator<char>(iFile)),
+		std::istreambuf_iterator<char>());
 
-	//for each line in the file, open.
-	while (std::getline(iFile, output_data)) {
+	size_t start = 0;
+	while (true) {
+		size_t end = file_contents.find("<hr>", start);
+		if (end == std::string::npos) break;
+
+		std::string event_block = file_contents.substr(start, end - start + 4);
+
+		//updating time of the events
 		std::string updated;
 		size_t pos = 0;
-
 		while (true) {
-			//start of string to filter for date.
-			size_t start = output_data.find("<mark>", pos);
-			if (start == std::string::npos) break;
+			size_t mstart = event_block.find("<mark>", pos);
+			if (mstart == std::string::npos) break;
 
-			//Appending all of the string prior to the string
-			updated += output_data.substr(pos, start - pos);
+			updated += event_block.substr(pos, mstart - pos);
 
-			size_t end = output_data.find("</mark>", start);
-			if (end == std::string::npos) {
-				// if no closing tag, just append rest and exit
-				updated += output_data.substr(start);
-				pos = output_data.size();
+			size_t mend = event_block.find("</mark>", mstart);
+			if (mend == std::string::npos) {
+				updated += event_block.substr(mstart);
+				pos = event_block.size();
 				break;
 			}
 
-			std::string mark_content = output_data.substr(start + 6, end - (start + 6));
+			std::string mark_content = event_block.substr(mstart + 6, mend - (mstart + 6));
 			size_t space_pos = mark_content.find(' ');
-
-			//if theres any day of the week located, we ignore
 			std::string date_str = (space_pos != std::string::npos) ? mark_content.substr(space_pos + 1) : mark_content;
 
-			//and calling the day of week function to account for new day
 			updated += "<mark>" + day_of_week(date_str, true) + "</mark>";
-			pos = end + 7;
+			pos = mend + 7;
 		}
+		if (pos < event_block.size()) updated += event_block.substr(pos);
 
-		if (pos < output_data.size())
-			updated += output_data.substr(pos);
-
-		output_data = std::move(updated);
-
-		//appending to the string vector
-		this->result.push_back(output_data);
-		std::cout << output_data;
+		this->result.push_back(updated);
+		start = end + 4;
 	}
 
-	
-	iFile.close();
+	if (start < file_contents.size()) {
+		std::string last_block = file_contents.substr(start);
+
+		// run the same <mark> update on the last block
+		std::string updated;
+		size_t pos = 0;
+		while (true) {
+			size_t mstart = last_block.find("<mark>", pos);
+			if (mstart == std::string::npos) break;
+
+			updated += last_block.substr(pos, mstart - pos);
+
+			size_t mend = last_block.find("</mark>", mstart);
+			if (mend == std::string::npos) {
+				updated += last_block.substr(mstart);
+				pos = last_block.size();
+				break;
+			}
+
+			std::string mark_content = last_block.substr(mstart + 6, mend - (mstart + 6));
+			size_t space_pos = mark_content.find(' ');
+			std::string date_str = (space_pos != std::string::npos) ? mark_content.substr(space_pos + 1) : mark_content;
+
+			updated += "<mark>" + day_of_week(date_str, true) + "</mark>";
+			pos = mend + 7;
+		}
+		if (pos < last_block.size()) updated += last_block.substr(pos);
+
+		this->result.push_back(updated);
+	}
+
 }
+
+/*
+* Method for shifting event up the list to the top.
+* @param email_reader with at least 2 events
+* @return updated results
+*/
+void email_reader::shift_event() {
+	//prevent shifting if nothing there to shift.
+	if (this->result.size() < 2) {
+		std::cout << "Not enough events to shift priority." << std::endl;
+		return;
+	}
+
+	//user chooses the event to prioritise
+	int res = this->find_event();
+	std::string priority_event = this->result[res];
+	
+	//the specific string is removed (to prevent duplication)
+	this->result.erase(this->result.begin() + res);
+	std::vector<std::string> temp = this->result;
+
+	//clearing the result and pushing back the priority event to the top
+	this->result.clear();
+	this->result.push_back(priority_event);
+
+	//shift the event to the top by pushing the rest below. 
+	for (std::string events : temp) {
+		this->result.push_back(events);
+	}
+
+	std::cout << "Event moved to front." << std::endl;
+}
+
 
 /*
 * Destructor for email reader object.
