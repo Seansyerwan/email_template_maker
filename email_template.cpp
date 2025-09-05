@@ -46,18 +46,18 @@ event_generic::event_generic() {};
 * @param name and description of event
 * @return generic event
 */
-event_generic::event_generic(std::string name, std::string desc, std::string time, std::string location) {
-	//this->setPriority(priority);
+event_generic::event_generic(std::string name, std::string desc, std::string date, std::string duration, std::string location) {
 	this->setName(name);
 	this->setDesc(desc);
-	this->setTime(time);
+	this->setDate(date);
+	this->setDuration(duration);
 	this->setLocation(location);
 }
 
 
 /*
 * Setter for name variable
-* @param string pointer for name of event
+* @param string for name of event
 * @return Updated name of event
 */
 void event_generic::setName(std::string name) {
@@ -66,7 +66,7 @@ void event_generic::setName(std::string name) {
 
 /*
 * Setter for description Variable
-* @param string pointer for description of event
+* @param string for description of event
 * @return Updated description of event
 */
 void event_generic::setDesc(std::string desc) {
@@ -75,14 +75,22 @@ void event_generic::setDesc(std::string desc) {
 
 
 /*
-* Setter for Time Variable
-* @param string referring to time of event
-* @return Updated time variable of event
+* Setter for Date Variable
+* @param string referring to date of event
+* @return Updated date variable of event
 */
-void event_generic::setTime(std::string time) {
-	this->time = day_of_week(time, false);
+void event_generic::setDate(std::string date) {
+	this->date = day_of_week(date, false);
 }
 
+/*
+* Setter for Duration Variable
+* @param string refferring to duration of event
+* @return updated duration variable of event
+*/
+void event_generic::setDuration(std::string duration) {
+	this->duration = duration;
+}
 
 /*
 * Setter for Location Variable
@@ -114,12 +122,21 @@ std::string event_generic::getDesc() {
 
 
 /*
-* Getter for Time variable
+* Getter for Date variable
 * @param N\A
-* @return Time of event
+* @return Date of event
 */
-std::string event_generic::getTime() {
-	return (this->time);
+std::string event_generic::getDate() {
+	return (this->date);
+}
+
+/*
+* Getter for duration variable
+* @param N\A
+* @return Duration of event
+*/
+std::string event_generic::getDuration() {
+	return (this->duration);
 }
 
 /*
@@ -147,10 +164,10 @@ event_generic::~event_generic() {
 * @param std::string* name, std::string* desc, std::string* collaborators
 * @return special event object
 */
-event_special::event_special(std::string name, std::string desc, std::string time, std::string location, std::string collaborators) {
+event_special::event_special(std::string name, std::string desc, std::string date, std::string location, std::string collaborators) {
 	this->setName(name);
 	this->setDesc(desc);
-	this->setTime(time);
+	this->setDate(date);
 	this->setLocation(location);
 	this->setCollaborators(collaborators);
 }
@@ -193,7 +210,7 @@ email_reader::email_reader() {}
 void email_reader::format(event_generic* event) {
 	std::string result = "";
 	result += "<h3>" + (event->getName()) + "</h3>\n\n";
-	result += "<p>" + (event->getDesc()) + "</p> <p>This event is taking place at <mark>" + (event->getTime()) + "</mark> <b>Located in " + (event->getLocation()) + "</b></p>\n\n";
+	result += "<p>" + (event->getDesc()) + "</p> <p>This event is taking place from <strong>" + (event->getDuration()) + "</strong> at <mark>" + (event->getDate()) + "</mark> <b>Located in " + (event->getLocation()) + "</b></p>\n\n";
 	result += "<hr>";
 	this->result.push_back(result);
 }
@@ -208,7 +225,7 @@ void email_reader::format(event_special* event) {
 	std::string result = "";
 	result += "<h3>" + (event->getName()) + "</h3>\n\n";
 	result += "<h4>In collaboration with " + (event->getCollaborators()) + "</h4>\n";
-	result += "<p>" + (event->getDesc()) + "</p> <p>This event is taking place at <mark>" + (event->getTime()) + "</mark> <b>Located in " + (event->getLocation()) + "</b></p>\n\n";
+	result += "<p>" + (event->getDesc()) + "</p> <p>This event is taking place from <strong>" + (event->getDuration()) + "</strong> at <mark>" + (event->getDate()) + "</mark> <b>Located in " + (event->getLocation()) + "</b></p>\n\n";
 	result += "<hr>";
 	this->result.push_back(result);
 	
@@ -226,19 +243,22 @@ std::vector<std::string> email_reader::getResult() {
 
 /*
 * Function to help with creating results for events
-* @param string& name, string& desc, string& time, string& location
+* @param string& name, string& desc, string& date, string& location
 * @return data filled from above
 */
-void result_creator_helper(std::string& name, std::string& desc, std::string& time, std::string& location) {
+void result_creator_helper(std::string& name, std::string& desc, std::string& date, std::string& duration, std::string& location) {
 	std::cout << "\nPlease input the name of the event here: ";
 	std::getline(std::cin, name);
 	std::cout << "\nPlease input the description of the event here: ";
 	std::getline(std::cin, desc);
 
-	std::cout << "\What day is this event taking place next? (Please add in DD/MM/YYYY): ";
-	std::getline(std::cin, time);
+	std::cout << "\nWhat day is this event taking place next? (Please add in DD/MM/YYYY): ";
+	std::getline(std::cin, date);
 
-	std::cout << "\Where is this event taking place?: ";
+	std::cout << "\nFrom what time until when is the event taking place? (E.G 9:00am-11:00am): ";
+	std::getline(std::cin, duration);
+
+	std::cout << "\nWhere is this event taking place?: ";
 	std::getline(std::cin, location);
 }
 
@@ -249,13 +269,14 @@ void result_creator_helper(std::string& name, std::string& desc, std::string& ti
 void email_reader::result_creator_generic() {
 	std::string name = "";
 	std::string desc = "";
-	std::string time = "";
+	std::string date = "";
+	std::string duration = "";
 	std::string location = "";
-
+	
 	
 	//create a new event, then format	
-	result_creator_helper(name, desc, time, location);
-	event_generic* event = new event_generic(name, desc, time, location);
+	result_creator_helper(name, desc, date, duration,  location);
+	event_generic* event = new event_generic(name, desc, date, duration, location);
 	this->format(event);
 	std::cin.clear();
 }
@@ -268,11 +289,12 @@ void email_reader::result_creator_generic() {
 void email_reader::result_creator_special() {
 	std::string name = "";
 	std::string desc = "";
-	std::string time = "";
+	std::string date = "";
+	std::string duration = "";
 	std::string location = "";
 	std::string collaborators = "";
 
-	result_creator_helper(name, desc, time, location);
+	result_creator_helper(name, desc, date, duration, location);
 
 	std::cout << "\nPlease input the collaborators of the event here: ";
 	std::getline(std::cin, collaborators);
@@ -281,7 +303,7 @@ void email_reader::result_creator_special() {
 	std::cin.clear();
 
 	//create a new event, then format
-	event_special* event = new event_special(name, desc, time, location, collaborators);
+	event_special* event = new event_special(name, desc, date, location, collaborators);
 	this->format(event);
 }
 
@@ -358,15 +380,15 @@ void email_reader::modify_result() {
 
 	char choice = ' ';
 	//user knows what they chose, so if it was a mistake, they can choose 4.
-	std::cout << "What do you wish to modify for index " + overall_index << " ?\n1:name\n2:desc\n3:time\n4:location\n5:collaborators\nOther inputs:None of the above\n" << std::endl;
+	std::cout << "What do you wish to modify for index " + overall_index << " ?\n1:name\n2:desc\n3:date\n4:duration\n5:location\n6:collaborators\nOther inputs:None of the above\n" << std::endl;
 	std::cin >> choice; 
 	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
 	//if the choice is one, two or three
-	if (choice == '1' || choice == '2' || choice == '3' || choice == '4' || choice == '5') {
+	if (choice == '1' || choice == '2' || choice == '3' || choice == '4' || choice == '5' || choice == '6') {
 
 		//should a user try to modify collaborators when not present, it is then ignored.
-		if (choice == '5') { 
+		if (choice == '6') { 
 			int present = this->result[overall_index].find("<h4>");
 			if (present == -1) {
 				std::cout << "No collaborators! Try again." << std::endl;
@@ -381,7 +403,7 @@ void email_reader::modify_result() {
 		std::string temp = "";
 		
 
-		//if else statement for what the user chose. 1 == name, 2 == desc, 3 == time, 4 == desc, 5 == collaborators.
+		//if else statement for what the user chose. 1 == name, 2 == desc, 3 == date, 4 == desc, 5 == collaborators.
 		if (choice == '1') {
 			temp = "<h3>" + res + this->result[overall_index].substr(this->result[overall_index].find("</h3>"));
 		}
@@ -392,9 +414,12 @@ void email_reader::modify_result() {
 			temp = this->result[overall_index].substr(0, this->result[overall_index].find("<mark>")) + +"<mark>" + day_of_week(res,false) + "" + this->result[overall_index].substr(this->result[overall_index].find("</mark>"));
 		}
 		else if (choice == '4') {
+			temp = this->result[overall_index].substr(0, this->result[overall_index].find("<strong>")) + +"<strong>" + day_of_week(res, false) + "" + this->result[overall_index].substr(this->result[overall_index].find("</strong>"));
+		}
+		else if (choice == '5') {
 			temp = this->result[overall_index].substr(0, this->result[overall_index].find("<b>")) + res + this->result[overall_index].substr(this->result[overall_index].find("</b>"));
 		} 
-		else if (choice == '5') {
+		else if (choice == '6') {
 			temp = this->result[overall_index].substr(0, this->result[overall_index].find("<h4>")) + "<h4>In collaboration with " + res + this->result[overall_index].substr(this->result[overall_index].find("</h4>"));
 		}
 
@@ -473,7 +498,7 @@ void email_reader::retrieve_email() {
 
 		std::string event_block = file_contents.substr(start, end - start + 4);
 
-		//updating time of the events
+		//updating date of the events
 		std::string updated;
 		size_t pos = 0;
 		while (true) {

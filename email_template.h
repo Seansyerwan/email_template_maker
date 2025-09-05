@@ -6,20 +6,23 @@ class email_reader;
 class event_generic{
 public:
 	event_generic();
-	event_generic(std::string name, std::string desc, std::string time, std::string location);
+	event_generic(std::string name, std::string desc, std::string time, std::string duration, std::string location);
 	void setName(std::string name);
 	void setDesc(std::string desc);
-	void setTime(std::string time);
+	void setDate(std::string date);
+	void setDuration(std::string duration);
 	void setLocation(std::string location);
 	std::string getName();
 	std::string getDesc();
-	std::string getTime();
+	std::string getDate();
+	std::string getDuration();
 	std::string getLocation();
 	~event_generic();
 protected:
 	std::string name;
 	std::string desc;
-	std::string time;
+	std::string date;
+	std::string duration;
 	std::string location;
 };
 
