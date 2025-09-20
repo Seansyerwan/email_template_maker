@@ -403,7 +403,7 @@ void email_reader::modify_result() {
 		std::string temp = "";
 		
 
-		//if else statement for what the user chose. 1 == name, 2 == desc, 3 == date, 4 == desc, 5 == collaborators.
+		//if else statement for what the user chose. 1 == name, 2 == desc, 3 == date, 4 == duration, 5 == location, 6 == collaborators.
 		if (choice == '1') {
 			temp = "<h3>" + res + this->result[overall_index].substr(this->result[overall_index].find("</h3>"));
 		}
@@ -414,7 +414,7 @@ void email_reader::modify_result() {
 			temp = this->result[overall_index].substr(0, this->result[overall_index].find("<mark>")) + +"<mark>" + day_of_week(res,false) + "" + this->result[overall_index].substr(this->result[overall_index].find("</mark>"));
 		}
 		else if (choice == '4') {
-			temp = this->result[overall_index].substr(0, this->result[overall_index].find("<strong>")) + +"<strong>" + day_of_week(res, false) + "" + this->result[overall_index].substr(this->result[overall_index].find("</strong>"));
+			temp = this->result[overall_index].substr(0, this->result[overall_index].find("<strong>")) +"<strong>" + res + "" + this->result[overall_index].substr(this->result[overall_index].find("</strong>"));
 		}
 		else if (choice == '5') {
 			temp = this->result[overall_index].substr(0, this->result[overall_index].find("<b>")) + res + this->result[overall_index].substr(this->result[overall_index].find("</b>"));
