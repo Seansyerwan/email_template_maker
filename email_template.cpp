@@ -408,7 +408,7 @@ void email_reader::modify_result() {
 			temp = "<h3>" + res + this->result[overall_index].substr(this->result[overall_index].find("</h3>"));
 		}
 		else if (choice == '2') {
-			temp = "</h3>" + this->result[overall_index].substr(0, this->result[overall_index].find("</h3>")) + "<p>" + res + "</p>";
+			temp = this->result[overall_index].substr(0, this->result[overall_index].find("<p>")) + "<p>" + res + "" + this->result[overall_index].substr(this->result[overall_index].find("</p>"));
 		}
 		else if (choice == '3') {
 			temp = this->result[overall_index].substr(0, this->result[overall_index].find("<mark>")) + +"<mark>" + day_of_week(res,false) + "" + this->result[overall_index].substr(this->result[overall_index].find("</mark>"));
